@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
-from typing import Tuple
+
 
 import numpy as np
 import pandas as pd
@@ -133,7 +133,7 @@ def simulate_voltage(
     soc: np.ndarray,
     dt: np.ndarray,
     ocv_from_soc: interp1d,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     v1 = 0.0
     v2 = 0.0
     v1_hist = np.zeros_like(current_a)
@@ -191,7 +191,7 @@ def estimate_soc(
     params: RcParams,
     ocv_curve: OcvCurve,
     soc_gain: float,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     time_s = df['time_s'].to_numpy()
     dt = np.diff(time_s, prepend=time_s[0])
     dt = np.where(dt < 0, 0, dt)
