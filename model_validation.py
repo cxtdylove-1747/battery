@@ -76,8 +76,9 @@ def build_ocv_curve(df: pd.DataFrame, rest_current_a: float, bins: int) -> OcvCu
     soc_curve = soc_curve[order]
     ocv_curve = ocv_curve[order]
 
-    soc_curve = soc_curve[(soc_curve >= 0) & (soc_curve <= 1)]
-    ocv_curve = ocv_curve[: len(soc_curve)]
+    valid_mask = (soc_curve >= 0) & (soc_curve <= 1)
+    soc_curve = soc_curve[valid_mask]
+    ocv_curve = ocv_curve[valid_mask]
 
     ocv_from_soc = interp1d(
         soc_curve,
@@ -174,11 +175,18 @@ def fit_rc_parameters(
         pred, _, _ = simulate_voltage(params, current_fit, soc_fit, dt_fit, ocv_curve.ocv_from_soc)
         return pred - voltage_fit
 
-    initial = np.array([0.005, 0.003, 2000.0, 0.008, 8000.0])
+    # Typical small-format Li-ion 2-RC starting guesses (Ohm/F range).
+    r0_init = 0.005
+    r1_init = 0.003
+    c1_init = 2000.0
+    r2_init = 0.008
+    c2_init = 8000.0
+    initial = np.array([r0_init, r1_init, c1_init, r2_init, c2_init])
     bounds = ([1e-5, 1e-5, 10.0, 1e-5, 10.0], [0.05, 0.05, 50000.0, 0.05, 50000.0])
 
     try:
-        result = least_squares(residuals, initial, bounds=bounds, max_nfev=200)
+        max_evaluations = 200  # Keep optimization quick for a single validation cycle.
+        result = least_squares(residuals, initial, bounds=bounds, max_nfev=max_evaluations)
         params = result.x
     except Exception:
         params = initial
