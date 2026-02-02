@@ -156,6 +156,7 @@ def fit_rc_parameters(
     df: pd.DataFrame,
     ocv_curve: OcvCurve,
     sample_stride: int,
+    max_nfev: int,
 ) -> RcParams:
     time_s = df['time_s'].to_numpy()
     dt = np.diff(time_s, prepend=time_s[0])
@@ -184,10 +185,10 @@ def fit_rc_parameters(
     bounds = ([1e-5, 1e-5, 10.0, 1e-5, 10.0], [0.05, 0.05, 50000.0, 0.05, 50000.0])
 
     try:
-        max_nfev = 200  # Keep optimization quick for a single validation cycle.
         result = least_squares(residuals, initial, bounds=bounds, max_nfev=max_nfev)
         params = result.x
-    except Exception:
+    except Exception as exc:
+        print(f'Warning: parameter fit failed ({exc}). Using initial guesses.')
         params = initial
 
     return RcParams(*params)
@@ -251,6 +252,12 @@ def main() -> None:
     parser.add_argument('--rest-current', type=float, default=0.01, help='Rest current threshold (A).')
     parser.add_argument('--ocv-bins', type=int, default=200, help='Bins for SOC-OCV curve.')
     parser.add_argument('--fit-stride', type=int, default=5, help='Sample stride for RC fitting.')
+    parser.add_argument(
+        '--max-nfev',
+        type=int,
+        default=200,
+        help='Max function evaluations for RC fitting (higher = slower, potentially more accurate).',
+    )
     parser.add_argument('--soc-gain', type=float, default=0.05, help='SOC correction gain (0-1).')
     args = parser.parse_args()
 
@@ -270,7 +277,7 @@ def main() -> None:
         f"  current range: {inc_df['current_a'].min():.3f} to {inc_df['current_a'].max():.3f} A"
     )
 
-    params = fit_rc_parameters(inc_df, ocv_curve, sample_stride=args.fit_stride)
+    params = fit_rc_parameters(inc_df, ocv_curve, sample_stride=args.fit_stride, max_nfev=args.max_nfev)
     print('\nFitted 2-RC parameters:')
     print(f"  {format_params(params)}")
 
