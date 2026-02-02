@@ -241,12 +241,12 @@ def main() -> None:
     parser.add_argument(
         '--ocv-file',
         default='11_5_2015_low current OCV test_SP20-1.xlsx',
-        help='Low current OCV Excel file.',
+        help='Low current OCV Excel file (keep filename as provided unless overridden).',
     )
     parser.add_argument(
         '--incremental-file',
         default='12_2_2015_Incremental OCV test_SP20-1.xlsx',
-        help='Incremental OCV Excel file.',
+        help='Incremental OCV Excel file (keep filename as provided unless overridden).',
     )
     parser.add_argument('--cycle-index', type=int, default=1, help='Cycle index to use for validation.')
     parser.add_argument('--rest-current', type=float, default=0.01, help='Rest current threshold (A).')

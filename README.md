@@ -6,8 +6,8 @@ This repository contains battery test data and a small Python script to validate
 
 The validation uses two Excel datasets:
 
-- `11_5_2015_low current OCV test_SP20-1.xlsx`: low current OCV test data. The script uses the rest segments (current close to 0 A) to build a SOC-OCV curve and estimates capacity from the discharge portion.
-- `12_2_2015_Incremental OCV test_SP20-1.xlsx`: incremental OCV test data. The script selects one `Cycle_Index` (default `1`) for model fitting and SOC validation.
+- `11_5_2015_low current OCV test_SP20-1.xlsx`: low current OCV test data. **Keep the filename exactly as provided** (including spaces/casing) unless you update the script defaults. The script uses the rest segments (current close to 0 A) to build a SOC-OCV curve and estimates capacity from the discharge portion.
+- `12_2_2015_Incremental OCV test_SP20-1.xlsx`: incremental OCV test data. **Keep the filename exactly as provided** unless you update the script defaults. The script selects one `Cycle_Index` (default `1`) for model fitting and SOC validation.
 
 ## Run the validation
 
