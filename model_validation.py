@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 
-
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -185,8 +184,8 @@ def fit_rc_parameters(
     bounds = ([1e-5, 1e-5, 10.0, 1e-5, 10.0], [0.05, 0.05, 50000.0, 0.05, 50000.0])
 
     try:
-        max_evaluations = 200  # Keep optimization quick for a single validation cycle.
-        result = least_squares(residuals, initial, bounds=bounds, max_nfev=max_evaluations)
+        max_nfev = 200  # Keep optimization quick for a single validation cycle.
+        result = least_squares(residuals, initial, bounds=bounds, max_nfev=max_nfev)
         params = result.x
     except Exception:
         params = initial
@@ -263,6 +262,8 @@ def main() -> None:
     print(f"  estimated capacity: {ocv_curve.capacity_ah:.3f} Ah")
 
     inc_df = load_incremental_data(args.incremental_file, args.cycle_index)
+    if inc_df.empty:
+        raise ValueError(f'No incremental data found for cycle {args.cycle_index}.')
     print('\nIncremental data selection:')
     print(f"  cycle {args.cycle_index} rows: {len(inc_df)}")
     print(
